@@ -22,6 +22,7 @@ L.FONT_FILES = {
  ["MSBT Morpheus"]		= "Fonts\\MORPHEUS.TTF",
  ["MSBT Nim"]			= "Fonts\\NIM_____.ttf",
  ["MSBT Skurri"]		= "Fonts\\SKURRI.TTF",
+ ["MSBT Porky"]			= "Interface\\Addons\\MikScrollingBattleText\\Fonts\\porky.ttf",
 }
 
 L.DEFAULT_FONT_NAME = "MSBT Nim"
