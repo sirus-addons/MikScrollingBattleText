@@ -2,7 +2,7 @@
 ## Version: 5.4.78
 ## Title: Mik's Scrolling Battle Text
 ## Author: Mikord
-## Notes: |@Version: 1@|Scrolls battle information around the character model.
+## Notes: |@Version: 2@|Scrolls battle information around the character model.
 ## SavedVariables: MSBTProfiles_SavedVars, MSBT_SavedMedia
 ## SavedVariablesPerCharacter: MSBTProfiles_SavedVarsPerChar
 ## OptionalDeps: LibSharedMedia-3.0
