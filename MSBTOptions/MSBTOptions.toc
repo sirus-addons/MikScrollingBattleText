@@ -1,7 +1,7 @@
 ## Interface: 30300
 ## Title: MSBT [|cffffff80Options|r]
 ## Author: Mikord
-## Notes: |@Version: 1@|Load on demand options for Mik's Scrolling Battle Text
+## Notes: |@Version: 3@|Load on demand options for Mik's Scrolling Battle Text
 ## Dependencies: MikScrollingBattleText
 ## LoadOnDemand: 1
 ## X-Child-Of: MikScrollingBattleText
