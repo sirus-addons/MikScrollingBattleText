@@ -594,13 +594,14 @@ local function MergeEvents(numEvents, currentProfile)
    -- Check if there were any events merged.
    if (mergedEvent.numMerged > 0) then
     -- Create the crit trailer text if there were any crits.
-    local critTrailer = ""
-    if (mergedEvent.numCrits > 0) then
-     critTrailer = string_format(", %d %s", mergedEvent.numCrits, mergedEvent.numCrits == 1 and L.MSG_CRIT or L.MSG_CRITS)
-    end
-   
-    -- Set the event's merge trailer field.
-    mergedEvent.mergeTrailer = string_format(" [%d %s%s]", mergedEvent.numMerged + 1, L.MSG_HITS, critTrailer)
+   local hits = mergedEvent.numMerged + 1
+   local crits = mergedEvent.numCrits
+
+   if (crits > 0) then
+   mergedEvent.mergeTrailer = string_format(" x%d c%d", hits, crits)
+   else
+ mergedEvent.mergeTrailer = string_format(" x%d", hits)
+end
    end -- Events were merged.
   end -- Loop through merged events.
  end
