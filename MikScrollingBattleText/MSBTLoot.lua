@@ -20,6 +20,7 @@ local MSBTParser = MikSBT.Parser
 -- Get local references to various functions for faster access.
 local string_gsub = string.gsub
 local string_format = string.format
+local string_match = string.match
 local math_ceil = math.ceil
 local GetItemInfo = GetItemInfo
 local GetItemCount = GetItemCount
@@ -81,6 +82,8 @@ local function HandleItems(parserEvent)
  -- Get information about the looted item.
  local itemLink = parserEvent.itemLink
  local itemName, _, itemQuality, _, _, itemType, _, _, _, itemTexture = GetItemInfo(itemLink)
+ itemName = itemName or string_match(itemLink, "%[(.+)%]")
+ if (not itemName) then return end
 
  -- Determine whether to show the event and ignore it if necessary.
  local currentProfile = MSBTProfiles.currentProfile

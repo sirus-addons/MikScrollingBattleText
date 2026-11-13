@@ -125,6 +125,7 @@ local classMapCleanupTime = 0
 local classMap = {}
 local classTimes = {}
 local arenaUnits = {}
+local _
 
 
 -------------------------------------------------------------------------------
@@ -208,6 +209,12 @@ local function GlobalStringCompareFunc(globalStringNameOne, globalStringNameTwo)
 end
 
 
+local function StripMarkup(text)
+ text = string_gsub(text, "|3%-%d+%((.-)%)", "%1")
+ return (string_gsub(text, "|4[^;]*;", ""))
+end
+
+
 -- ****************************************************************************
 -- Converts the passed global string into a lua search pattern with a capture
 -- order table and stores the results so any requests to convert the same
@@ -227,8 +234,11 @@ local function ConvertGlobalString(globalStringName)
  local captureOrder
  local numCaptures = 0
 
+ local searchPattern = string.gsub(globalString, "|3%-%d+%((.-)%)", "%1")
+ searchPattern = string.gsub(searchPattern, "|4[^;]*;", "\1")
+
  -- Escape lua magic chars.
- local searchPattern = string.gsub(globalString, "([%^%(%)%.%[%]%*%+%-%?])", "%%%1")
+ searchPattern = string.gsub(searchPattern, "([%^%(%)%.%[%]%*%+%-%?])", "%%%1")
 
  -- Loop through each capture and setup the capture order.
  for captureIndex in string_gmatch(searchPattern, "%%(%d)%$[sd]") do
@@ -243,6 +253,8 @@ local function ConvertGlobalString(globalStringName)
 
  -- Escape any remaining $ chars.
  searchPattern = string.gsub(searchPattern, "%$", "%%$")
+
+ searchPattern = string.gsub(searchPattern, "\1", ".-")
  
  -- Cache the converted pattern and capture order.
  searchPatterns[globalStringName] = searchPattern
@@ -487,11 +499,11 @@ local function CreateSearchCaptureFuncs()
   COMBATLOG_XPGAIN_FIRSTPERSON_UNNAMED = function (p, c) p.eventType, p.amount = "experience", c[1] end,
 
   -- Reputation events.
-  FACTION_STANDING_DECREASED = function (p, c) p.eventType, p.isLoss, p.factionName, p.amount = "reputation", true, c[1], c[2] end,
-  FACTION_STANDING_INCREASED = function (p, c) p.eventType, p.factionName, p.amount = "reputation", c[1], c[2] end,
+  FACTION_STANDING_DECREASED = function (p, c) p.eventType, p.isLoss, p.factionName, p.amount = "reputation", true, StripMarkup(c[1]), c[2] end,
+  FACTION_STANDING_INCREASED = function (p, c) p.eventType, p.factionName, p.amount = "reputation", StripMarkup(c[1]), c[2] end,
 
   -- Proficiency events.
-  SKILL_RANK_UP = function (p, c) p.eventType, p.skillName, p.amount = "proficiency", c[1], c[2] end,
+  SKILL_RANK_UP = function (p, c) p.eventType, p.skillName, p.amount = "proficiency", StripMarkup(c[1]), c[2] end,
 
   -- Loot events.
   LOOT_ITEM_SELF = function (p, c) p.eventType, p.itemLink, p.amount = "loot", c[1], c[2] end,
@@ -525,7 +537,7 @@ local function FindRareWords()
  -- Loop through all of the supported global strings.
  for globalStringName in pairs(searchCaptureFuncs) do
   -- Strip out all of the formatting codes.
-  local strippedGS = string.gsub(_G[globalStringName], "%%%d?%$?[sd]", "")
+  local strippedGS = string.gsub(StripMarkup(_G[globalStringName]), "%%%d?%$?[sd]", "")
 
   -- Count how many times each word appears in the global string.
   for word in string_gmatch(strippedGS, "%w+") do
@@ -539,7 +551,7 @@ local function FindRareWords()
   local leastSeen, rarestWord
 
   -- Strip out all of the formatting codes.
-  local strippedGS = string.gsub(_G[globalStringName], "%%%d?%$?[sd]", "")
+  local strippedGS = string.gsub(StripMarkup(_G[globalStringName]), "%%%d?%$?[sd]", "")
 
   -- Find the rarest word in the global string.
   for word in string_gmatch(strippedGS, "%w+") do
@@ -563,7 +575,7 @@ local function ValidateRareWords()
  -- Loop through all of the global strings there is a rare word entry for.
  for globalStringName, rareWord in pairs(rareWords) do
   -- Remove the entry if the rare word isn't found in the associated global string.
-  if (not string_find(_G[globalStringName], rareWord, 1, true)) then
+  if (not string_find(StripMarkup(_G[globalStringName]), rareWord, 1, true)) then
    rareWords[globalStringName] = nil
   end
  end
@@ -886,7 +898,7 @@ local function Enable()
 
  -- Update the unit map and current pet information.
  isUnitMapStale = true
- isPetNameStale = true
+ isPetMapStale = true
 
  -- Start receiving updates.
  eventFrame:Show()

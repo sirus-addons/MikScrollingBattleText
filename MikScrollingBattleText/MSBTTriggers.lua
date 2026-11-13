@@ -81,6 +81,7 @@ local triggersToFire = {}
 
 -- Hold buffs and debuffs that should be suppressed since there is a trigger for them.
 local triggerSuppressions = {}
+local _
 
 
 -------------------------------------------------------------------------------
@@ -204,7 +205,7 @@ local function CreateConditionFuncs()
 
  -- Exception conditions.
  exceptionConditionFuncs = {
-  activeTalents = function (f, t, v) return f(GetActiveTalentGroup(), v) end,
+  activeTalents = function (f, t, v) return f(C_Talent and C_Talent.GetActiveTalentGroup and C_Talent.GetActiveTalentGroup() or GetActiveTalentGroup(), v) end,
   buffActive = function (f, t, v) return UnitBuff("player", v) and true or false end,
   buffInactive = function (f, t, v) return not UnitBuff("player", v) and true or false end,
   currentCP = function (f, t, v) return f(GetComboPoints("player"), v) end,
@@ -730,6 +731,15 @@ local function OnEvent(this, event, arg1, ...)
 end
 
 
+local healthPollElapsed = 0
+local function OnUpdate(this, elapsed)
+ healthPollElapsed = healthPollElapsed + elapsed
+ if (healthPollElapsed < 0.2) then return end
+ healthPollElapsed = 0
+ if (UnitExists("target")) then HandleHealthAndPowerTriggers("target", "UNIT_HEALTH", UnitHealth("target"), UnitHealthMax("target")) end
+end
+
+
 -- ****************************************************************************
 -- Enables the trigger parsing.
 -- ****************************************************************************
@@ -738,6 +748,7 @@ local function Enable()
  for event in pairs(listenEvents) do
   eventFrame:RegisterEvent(event)
  end
+ eventFrame:Show()
 end
 
 
@@ -747,6 +758,7 @@ end
 local function Disable()
  -- Unregister all of the events from the event frame.
  eventFrame:UnregisterAllEvents()
+ eventFrame:Hide()
 end
 
 
@@ -763,6 +775,7 @@ _, playerClass = UnitClass("player")
 eventFrame = CreateFrame("Frame")
 eventFrame:Hide()
 eventFrame:SetScript("OnEvent", OnEvent)
+eventFrame:SetScript("OnUpdate", OnUpdate)
  
 -- Create function maps.
 CreateCaptureFuncs()

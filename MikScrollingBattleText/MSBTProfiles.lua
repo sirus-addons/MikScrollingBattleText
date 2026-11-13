@@ -1717,7 +1717,6 @@ local function DisableBlizzardCombatText()
  SetCVar("CombatDamage", 0)
  SetCVar("CombatHealing", 0)
  SetCVar("enableCombatText", 0)
- SHOW_COMBAT_TEXT = "0"
  if (CombatText_UpdateDisplayedMessages) then CombatText_UpdateDisplayedMessages() end
 end
 
@@ -1781,7 +1780,7 @@ local function UpdateProfiles()
  -- Loop through all the profiles.
  for profileName, profile in pairs(savedVariables.profiles) do
   -- Get numeric creation version.
-  local creationVersion = tonumber(select(3, string_find(tostring(profile.creationVersion), "(%d+%.%d+)")))
+  local creationVersion = tonumber((select(3, string_find(tostring(profile.creationVersion), "(%d+%.%d+)")))) or 0
 
   -- Delete triggers if upgrading from a version prior to 5.2.
   if (creationVersion < 5.2) then
