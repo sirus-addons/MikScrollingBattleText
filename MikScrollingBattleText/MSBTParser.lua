@@ -898,7 +898,7 @@ local function Enable()
 
  -- Update the unit map and current pet information.
  isUnitMapStale = true
- isPetNameStale = true
+ isPetMapStale = true
 
  -- Start receiving updates.
  eventFrame:Show()

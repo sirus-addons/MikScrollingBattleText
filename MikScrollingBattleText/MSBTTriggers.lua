@@ -731,6 +731,15 @@ local function OnEvent(this, event, arg1, ...)
 end
 
 
+local healthPollElapsed = 0
+local function OnUpdate(this, elapsed)
+ healthPollElapsed = healthPollElapsed + elapsed
+ if (healthPollElapsed < 0.2) then return end
+ healthPollElapsed = 0
+ if (UnitExists("target")) then HandleHealthAndPowerTriggers("target", "UNIT_HEALTH", UnitHealth("target"), UnitHealthMax("target")) end
+end
+
+
 -- ****************************************************************************
 -- Enables the trigger parsing.
 -- ****************************************************************************
@@ -739,6 +748,7 @@ local function Enable()
  for event in pairs(listenEvents) do
   eventFrame:RegisterEvent(event)
  end
+ eventFrame:Show()
 end
 
 
@@ -748,6 +758,7 @@ end
 local function Disable()
  -- Unregister all of the events from the event frame.
  eventFrame:UnregisterAllEvents()
+ eventFrame:Hide()
 end
 
 
@@ -764,6 +775,7 @@ _, playerClass = UnitClass("player")
 eventFrame = CreateFrame("Frame")
 eventFrame:Hide()
 eventFrame:SetScript("OnEvent", OnEvent)
+eventFrame:SetScript("OnUpdate", OnUpdate)
  
 -- Create function maps.
 CreateCaptureFuncs()
