@@ -58,6 +58,7 @@ local eventFrame
 
 -- Player's class.
 local playerClass
+local _
 
 -- Cooldown information.
 local activeCooldowns = {}

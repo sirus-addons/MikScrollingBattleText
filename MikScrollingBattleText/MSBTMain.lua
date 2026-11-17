@@ -149,6 +149,7 @@ local ignoreAuras = {}
 local regenAbilities = {}
 local activeRegenAbility
 local activeRegenTexture
+local _
 
 
 -------------------------------------------------------------------------------
@@ -228,17 +229,17 @@ local function FormatPartialEffects(absorbAmount, blockAmount, resistAmount, isG
  local partialEffectText = ""
 
  -- Partial Absorb
- if (absorbAmount) then
+ if (absorbAmount and absorbAmount ~= 0) then
   effectSettings = currentProfile.absorb
   amount = absorbAmount
 
  -- Partial Block
- elseif (blockAmount) then
+ elseif (blockAmount and blockAmount ~= 0) then
   effectSettings = currentProfile.block
   amount = blockAmount
 
  -- Partial Resist
- elseif (resistAmount) then
+ elseif (resistAmount and resistAmount ~= 0) then
   effectSettings = currentProfile.resist
   amount = resistAmount
  end
@@ -729,6 +730,16 @@ local function EnvironmentalHandler(parserEvent, currentProfile)
 end
 
 
+local function IsServiceAura(spellID)
+ if (not spellID) then return end
+ if (FACTION_OVERRIDE_BY_DEBUFFS and FACTION_OVERRIDE_BY_DEBUFFS[spellID]) then return true end
+ if (ZODIAC_DEBUFFS and ZODIAC_DEBUFFS[spellID]) then return true end
+ if (S_CATEGORY_SPELL_ID and S_CATEGORY_SPELL_ID[spellID]) then return true end
+ if (S_VIP_STATUS_DATA and S_VIP_STATUS_DATA[spellID]) then return true end
+ if (S_PREMIUM_SPELL_ID and S_PREMIUM_SPELL_ID[spellID]) then return true end
+end
+
+
 -- ****************************************************************************
 -- Handles aura parser events.
 -- ****************************************************************************
@@ -738,6 +749,8 @@ local function AuraHandler(parserEvent, currentProfile)
   
  -- Aura is pertaining to the player.
  if (parserEvent.recipientUnit == "player") then
+  if (IsServiceAura(parserEvent.skillID)) then return end
+
   -- Ignore auras that don't provide useful information.
   if (ignoreAuras[parserEvent.skillName] and parserEvent.sourceUnit == "player") then return end
   

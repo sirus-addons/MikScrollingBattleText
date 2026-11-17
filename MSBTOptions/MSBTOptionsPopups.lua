@@ -1449,8 +1449,8 @@ end
 local function SaveScrollAreaMoverCoordinates(frame)
  -- Get the UIParent center x and y coords.
  local uiParentX, uiParentY = UIParent:GetCenter()
- local xOffset = math.ceil(this:GetLeft() - uiParentX)
- local yOffset = math.ceil(this:GetBottom() - uiParentY)
+ local xOffset = math.ceil(frame:GetLeft() - uiParentX)
+ local yOffset = math.ceil(frame:GetBottom() - uiParentY)
  
  -- Save the x and y offsets.
  local configFrame = popupFrames.scrollAreaConfigFrame
@@ -2733,7 +2733,7 @@ local function CreateMainEvent()
   function (this)
    local eventType = frame.mainEventDropdown:GetSelectedID()
    local conditionData = popupFrames.triggerFrame.eventConditionData[eventType]
-   local conditionType, conditionRelation, conditionValue
+   local _, conditionType, conditionRelation, conditionValue
    if (conditionData and conditionData.defaultConditions ~= "") then
     _, _, conditionType, conditionRelation, conditionValue = string.find(conditionData.defaultConditions, "(.-);;(.-);;(.-)")
 	conditionValue = conditionValue and ConvertType(conditionValue)
@@ -3397,6 +3397,9 @@ local function CreateTriggerPopup()
   [1] = TALENT_SPEC_PRIMARY,
   [2] = TALENT_SPEC_SECONDARY,
  }
+ if (C_Talent and C_Talent.GetNumTalentGroups and TALENT_TAB_NAME) then
+  for talentGroup = 3, C_Talent.GetNumTalentGroups() do talentSpecs[talentGroup] = string.format(TALENT_TAB_NAME, talentGroup) end
+ end
 
  -- Localized warrior stances.
  local warriorStances = {
